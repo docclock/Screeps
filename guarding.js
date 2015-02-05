@@ -1,16 +1,35 @@
-
  module.exports = function (creep) {
      
-   //	if(creep.energy == 0) {
-	 //   creep.moveTo(Game.spawns.Spawn1);
-	//	Game.spawns.Spawn1.transferEnergy(creep);
-  //  }
-   // else{
-    
-      var targets = creep.pos.findInRange(Game.HOSTILE_CREEPS, 3);
-      if(targets.length > 0) {
-         creep.rangedAttack(targets[0]);
-         creep.rangedAttack(targets[0]);
-      }
-   // }
+     var target=null;
+     var spawn = Game.spawns.Spawn1;
+     var closestE = spawn.pos.findClosest(Game.HOSTILE_CREEPS);
+  
+     if(closestE){
+        target = closestE;
+     }
+     else{
+         var targets = creep.pos.findClosest(Game.HOSTILE_CREEPS);
+         if(targets){
+             target = targets[0];
+         }
+   }
+    if(target){
+         
+        //if(!creep.pos.inRangeTo(target.pos,3)){
+            
+            creep.moveTo(target);
+       // }
+        creep.attack(target);
+        creep.rangedAttack(target);
+    }
+    else if(!creep.pos.inRangeTo(spawn.pos,5) ){
+        creep.moveTo(spawn); 
+    }
+   
+    if( (creep.getActiveBodyparts(Game.ATTACK) == 0 & 
+    creep.getActiveBodyparts(Game.RANGED_ATTACK)==0)
+        || creep.getActiveBodyparts(Game.MOVE) == 0)
+    {
+       creep.suicide();
+    }
 }
