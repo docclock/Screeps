@@ -1,0 +1,62 @@
+module.exports = function (creep) {
+ 
+ if(creep.memory.source==undefined)
+ {
+    var target= findbest(creep);
+   
+    if(target && (creep.energy < creep.energyCapacity))
+    {
+       creep.memory.source=target.id;
+    }
+  }
+  else if(creep.memory.source!=undefined){
+        var sources = creep.room.find(Game.DROPPED_ENERGY);
+        var target= sources[0];
+        for(var i=0;i< sources.length; i++){
+            if(sources[i].id==creep.memory.source){
+                target=sources[i];
+                break;
+            }
+        }
+        if(target && target.energy==0){
+            creep.memory.source=undefined;
+        }
+        else{
+          creep.moveTo(target);
+	      creep.pickup(target);
+        }
+    }
+   
+    if(creep.getActiveBodyparts(Game.MOVE) == 0 ||
+        creep.getActiveBodyparts(Game.CARRY) == 0){
+        creep.suicide();
+    }
+    
+    if(creep.energy >= creep.energyCapacity || findbest(creep)==null) {
+     creep.memory.source=undefined;
+	 creep.moveTo(Game.spawns.Spawn1);
+	 creep.transferEnergy(Game.spawns.Spawn1)
+   }
+}
+
+findbest = function(creep){
+    var newtargets = creep.room.find(Game.DROPPED_ENERGY);
+    if(newtargets.length>0)
+   {
+       var biggest = newtargets[0];
+          
+        for(var i=0; i< newtargets.length;i++){
+          if(newtargets[i].energy > biggest.energy){
+              // if(!(ncreep && creep.id!=ncreep.id && ncreep.memory &&
+              //    ncreep.memory.role=='carrier'))
+              var tar= newtargets[i];
+              var closest = tar.pos.findClosest(Game.MY_CREEPS);
+                if(tar.energy> biggest.energy &&
+                ( closest.id==creep.id || closest.role!='carrier')){
+                    biggest=newtargets[i];
+                }
+           }
+        }
+        return biggest;
+   }
+}
